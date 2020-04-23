@@ -1,19 +1,41 @@
-import { IsString, IsNotEmpty } from 'class-validator';
-import { PasswordOwnerDto } from './password-owner.dto';
-import { Unique } from 'src/common/validators/unique.validator';
-import { User } from '../user.entity';
+import { IsNotEmpty, IsString, Length, MinLength, MaxLength } from "class-validator";
+import { ValidIfCondition } from "src/common/validators/condition.validator";
+import { Unique } from "src/common/validators/unique.validator";
+import { User } from "../user.entity";
 
-export class CreateUserDto extends PasswordOwnerDto {
-    @IsString()
-    @IsNotEmpty()
-    firstName: string;
+export class CreateUserDto {
+  @MinLength(1)
+  @MaxLength(30)
+  @IsString()
+  @IsNotEmpty()
+  @Unique(User, 'Username must be unique')
+  username: string;
+  
+  @MinLength(2)
+  @MaxLength(30)
+  @IsString()
+  @IsNotEmpty()
+  firstName: string;
 
-    @IsString()
-    @IsNotEmpty()
-    lastName: string;
+  @MinLength(2)
+  @MaxLength(30)
+  @IsString()
+  @IsNotEmpty()
+  lastName: string;
 
-    @IsString()
-    @IsNotEmpty()
-    @Unique(User)
-    username: string;
+  @MinLength(6)
+  @MaxLength(50)
+  @IsString()
+  @IsNotEmpty()
+  password: string;
+
+  @MinLength(6)
+  @MaxLength(50)
+  @IsString()
+  @IsNotEmpty()
+  @ValidIfCondition(
+    dto => dto.password === dto.passwordConfirmation,
+    'passwordConfirmation field must be equal with password field',
+  )
+  passwordConfirmation: string;
 }

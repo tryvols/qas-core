@@ -1,25 +1,27 @@
-import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert } from "typeorm";
-import { hash } from 'bcryptjs';
+import { PrimaryGeneratedColumn, Entity, Column, BeforeInsert } from "typeorm";
+import { Exclude } from "class-transformer";
+import { UsersUtils } from "./utils";
 
-@Entity({ name: 'users' })
+@Entity()
 export class User {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column()
-    firstName: string;
+  @Column()
+  username: string;
 
-    @Column()
-    lastName: string;
+  @Column()
+  firstName: string;
 
-    @Column({ unique: true })
-    username: string;
+  @Column()
+  lastName: string;
 
-    @Column()
-    password: string;
+  @Column()
+  @Exclude()
+  password: string;
 
-    @BeforeInsert()
-    async encryptPassword() {
-        this.password = await hash(this.password, 10);
-    }
+  @BeforeInsert()
+  async passwordEncryption(): Promise<void> {
+    this.password = await UsersUtils.encodePassword(this.password);
+  }
 }

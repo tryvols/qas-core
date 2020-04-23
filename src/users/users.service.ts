@@ -2,33 +2,46 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
-import { CreateUserDto } from './dto';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UsersService {
-    constructor(
-        @InjectRepository(User)
-        private readonly usersRepository: Repository<User>,
-    ) {}
+  constructor(
+    @InjectRepository(User) private usersRepository: Repository<User>
+  ) {
+    this.initUsers();
+  }
 
-    async findAll(): Promise<User[]> {
-        return await this.usersRepository.find();
-    }
+  // TODO:clear-before-production
+  async initUsers(): Promise<void> {
+    await this.usersRepository.createQueryBuilder()
+      .delete()
+      .from(User)
+      .execute();
+    await this.usersRepository.insert([{
+      username: 'john',
+      password: 'changeme',
+      firstName: 'John',
+      lastName: 'Readlock',
+    }, {
+      username: 'chris',
+      password: 'secret',
+      firstName: 'Chris',
+      lastName: 'Steelbrought',
+    }, {
+      username: 'maria',
+      password: 'guess',
+      firstName: 'Maria',
+      lastName: 'Cleanington',
+    }]);
+  }
 
-    async findOne(id: number): Promise<User> {
-        return await this.usersRepository.findOne(id);
-    }
+  async findOneByUsername(username: string): Promise<User> {
+    return await this.usersRepository.findOne({ username });
+  }
 
-    async findOneByUsername(username: string): Promise<User> {
-        return await this.usersRepository.findOne({ username });
-    }
-
-    async create(userDto: CreateUserDto): Promise<User> {
-        const user = await this.usersRepository.create(userDto);
-        return await this.usersRepository.save(user);
-    }
-
-    async remove(id: number): Promise<void> {
-        await this.usersRepository.delete(id);
-    }
+  async create(user: CreateUserDto): Promise<void> {
+    const newUser = await this.usersRepository.create(user);
+    await this.usersRepository.save(newUser);
+  }
 }

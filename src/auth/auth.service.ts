@@ -1,31 +1,34 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException, InternalServerErrorException } from '@nestjs/common';
+import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
-import { hash } from 'bcryptjs';
-import { WithAccessToken } from './types';
-import { UserWithoutPassword } from 'src/users/types';
-import { UsersService } from 'src/users/users.service';
-import { UsersUtils } from 'src/users/users.utils';
+import { User } from 'src/users/user.entity';
+import { UsersUtils } from 'src/users/utils';
+import { CreateUserDto } from 'src/users/dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
-    constructor(
-        private readonly usersService: UsersService,
-        private readonly usersUtils: UsersUtils,
-        private readonly jwtService: JwtService,
-    ) {}
+  constructor(
+    private usersService: UsersService,
+    private jwtService: JwtService,
+  ) {}
 
-    async validateUser(username: string, pass: string): Promise<UserWithoutPassword | null> {
-        const user = await this.usersService.findOneByUsername(username);
-        const passwordHash = hash(pass, 10);
-        return user?.password === passwordHash
-            ? this.usersUtils.excludePassword(user)
-            : null;
+  async validateUser(username: string, pass: string): Promise<any> {
+    const user = await this.usersService.findOneByUsername(username);
+    if (user && await UsersUtils.checkPassword(pass, user.password)) {
+      const { password, ...result } = user;
+      return result;
     }
+    return null;
+  }
 
-    async login(user: UserWithoutPassword): Promise<WithAccessToken> {
-        const payload = { username: user.username, sub: user.id };
-        return {
-            access_token: this.jwtService.sign(payload),
-        };
-    }
+  async login(user: any) {
+    const payload = { username: user.username, sub: user.id };
+    return {
+      access_token: this.jwtService.sign(payload),
+    };
+  }
+
+  async register(user: CreateUserDto) {
+    await this.usersService.create(user);
+  }
 }

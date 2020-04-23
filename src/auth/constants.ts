@@ -1,3 +1,5 @@
+import { randomBytes } from 'crypto';
+
 export const jwtConstants = {
-    secret: 'secretKey',
+  secret: randomBytes(256).toString('base64'),
 };
