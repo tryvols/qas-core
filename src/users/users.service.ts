@@ -14,10 +14,6 @@ export class UsersService {
 
   // TODO:clear-before-production
   async initUsers(): Promise<void> {
-    await this.usersRepository.createQueryBuilder()
-      .delete()
-      .from(User)
-      .execute();
     await this.usersRepository.insert([{
       username: 'john',
       password: 'changeme',

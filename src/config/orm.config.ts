@@ -17,8 +17,10 @@ const ormConfig: TypeOrmModuleOptions = {
     database: POSTGRES_DB,
     entities: [__dirname + '/../**/*.entity{.ts,.js}'],
 
-    // We are using migrations, synchronize should be set to false.
+    // We are using migrations, synchronize should be set to false while production.
     synchronize: true,
+    // Allows to reset database each time app init, shoul be set to false while production.
+    dropSchema: true,
 
     // Run migrations automatically,
     // you can disable this if you prefer running migration manually.

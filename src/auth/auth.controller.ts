@@ -9,13 +9,13 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Req() req) {
+  async login(@Req() req: any): Promise<any> {
     return this.authService.login(req.user);
   }
 
   @Post('registration')
   @HttpCode(201)
-  async registration(@Body() createUserDto: CreateUserDto) {
+  async registration(@Body() createUserDto: CreateUserDto): Promise<void> {
     this.authService.register(createUserDto);
   }
 }
