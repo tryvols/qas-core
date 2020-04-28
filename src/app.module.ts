@@ -5,6 +5,7 @@ import { UniqueValidator } from './common/validators/unique.validator';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { QueueModule } from './queue/queue.module';
+import { QueueItemModule } from './queue-item/queue-item.module';
 
 @Module({
     imports: [
@@ -12,6 +13,7 @@ import { QueueModule } from './queue/queue.module';
         UsersModule,
         AuthModule,
         QueueModule,
+        QueueItemModule,
     ],
     providers: [
         UniqueValidator,

@@ -1,10 +1,18 @@
-import { Controller } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Param,
+  BadRequestException,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { Crud } from '@nestjsx/crud';
 import { Queue } from './queue.entity';
 import { QueueService } from './queue.service';
 import { CreateQueueDto } from './dto/create-queue.dto';
 import { UpdateQueueDto } from './dto/update-queue.dto';
 import { ReplaceQueueDto } from './dto/replace-queue.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Crud({
   model: {
@@ -16,7 +24,34 @@ import { ReplaceQueueDto } from './dto/replace-queue.dto';
     replace: ReplaceQueueDto,
   },
 })
+@UseGuards(JwtAuthGuard)
 @Controller('queues')
 export class QueueController {
-  constructor(public service: QueueService) {}
+  constructor(public readonly service: QueueService) {}
+
+  @Post(':queueId/enter')
+  async enterQueue(
+    @Param('queueId') queueId: number,
+    @Req() req,
+  ) {
+    const queue = await this.service.findOne(queueId);
+    if (!queue) {
+      throw new BadRequestException(`Queue with ${queueId} does not exists.`);
+    }
+
+    return await this.service.addUser(queue, req.user);
+  }
+
+  @Post(':queueId/leave')
+  async leaveQueue(
+    @Param('queueId') queueId: number,
+    @Req() req,
+  ) {
+    const queue = await this.service.findOne(queueId);
+    if (!queue) {
+      throw new BadRequestException(`Queue with ${queueId} does not exists.`);
+    }
+
+    return await this.service.removeUser(queue, req.user);
+  }
 }

@@ -1,7 +1,8 @@
-import { Controller, UseGuards, Post, Req, HttpCode, Body } from "@nestjs/common";
+import { Controller, UseGuards, Post, Req, HttpCode, Body, UseInterceptors, ClassSerializerInterceptor } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { LocalAuthGuard } from "./guards/local-auth.guard";
 import { CreateUserDto } from "src/users/dto/create-user.dto";
+import { User } from "src/users/user.entity";
 
 @Controller('auth')
 export class AuthController {
@@ -13,9 +14,10 @@ export class AuthController {
     return this.authService.login(req.user);
   }
 
-  @Post('registration')
   @HttpCode(201)
-  async registration(@Body() createUserDto: CreateUserDto): Promise<void> {
-    this.authService.register(createUserDto);
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Post('registration')
+  async registration(@Body() createUserDto: CreateUserDto): Promise<User> {
+    return await this.authService.register(createUserDto);
   }
 }

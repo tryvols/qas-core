@@ -29,7 +29,7 @@ export class AuthService {
     };
   }
 
-  async register(user: CreateUserDto): Promise<void> {
-    await this.usersService.create(user);
+  async register(user: CreateUserDto): Promise<User> {
+    return await this.usersService.create(user);
   }
 }

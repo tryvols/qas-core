@@ -3,12 +3,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
+import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
+import { UsersUtils } from './utils';
 
 @Injectable()
-export class UsersService {
+export class UsersService extends TypeOrmCrudService<User> {
   constructor(
-    @InjectRepository(User) private usersRepository: Repository<User>
+    @InjectRepository(User) private usersRepository: Repository<User>,
   ) {
+    super(usersRepository);
     this.initUsers();
   }
 
@@ -16,19 +19,24 @@ export class UsersService {
   async initUsers(): Promise<void> {
     await this.usersRepository.insert([{
       username: 'john',
-      password: 'changeme',
+      password: await UsersUtils.encodePassword('changeme'),
       firstName: 'John',
       lastName: 'Readlock',
     }, {
       username: 'chris',
-      password: 'secret',
+      password: await UsersUtils.encodePassword('secret'),
       firstName: 'Chris',
       lastName: 'Steelbrought',
     }, {
       username: 'maria',
-      password: 'guess',
+      password: await UsersUtils.encodePassword('guess'),
       firstName: 'Maria',
       lastName: 'Cleanington',
+    }, {
+      username: 'sony',
+      password: await UsersUtils.encodePassword('password'),
+      firstName: 'Sony',
+      lastName: 'Jenkins',
     }]);
   }
 
@@ -36,8 +44,12 @@ export class UsersService {
     return await this.usersRepository.findOne({ username });
   }
 
-  async create(user: CreateUserDto): Promise<void> {
+  async findOneById(id: number): Promise<User> {
+    return await this.usersRepository.findOne(id);
+  }
+
+  async create(user: CreateUserDto): Promise<User> {
     const newUser = await this.usersRepository.create(user);
-    await this.usersRepository.save(newUser);
+    return await this.usersRepository.save(newUser);
   }
 }
