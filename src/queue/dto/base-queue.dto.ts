@@ -10,14 +10,14 @@ export class BaseQueueDto {
   @MinLength(10)
   @MaxLength(100)
   address: string;
-
-  @IsNumber()
-  @IsOptional()
-  maxVolume?: number;
 }
 
 export class NewQueueEntityDto extends BaseQueueDto {
   @IsISO8601({ strict: true })
   @IsOptional()
   expiresAt?: Date;
+
+  @IsNumber()
+  @IsOptional()
+  maxVolume?: number;
 }

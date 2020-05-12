@@ -18,6 +18,19 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
   model: {
     type: Queue,
   },
+  query: {
+    join: {
+      items: {
+        eager: false,
+      },
+      'items.user': {
+        eager: false,
+      },
+    },
+    alwaysPaginate: true,
+    limit: 25,
+    maxLimit: 25,
+  },
   dto: {
     create: CreateQueueDto,
     update: UpdateQueueDto,

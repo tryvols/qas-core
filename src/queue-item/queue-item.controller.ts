@@ -10,9 +10,15 @@ import { QueueItemService } from './queue-item.service';
   query: {
     join: {
       user: {
-        eager: true,
-      }
-    }
+        eager: false,
+      },
+      queue: {
+        eager: false,
+      },
+    },
+    alwaysPaginate: true,
+    limit: 25,
+    maxLimit: 25,
   },
   routes: {
     only: ['getManyBase'],

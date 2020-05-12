@@ -11,6 +11,7 @@ async function bootstrap() {
     skipMissingProperties: false,
     forbidUnknownValues: true,
   }));
+  app.enableCors();
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
   await app.listen(3000);
 }

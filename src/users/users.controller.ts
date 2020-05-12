@@ -8,9 +8,22 @@ import { UsersService } from "./users.service";
   model: {
     type: User,
   },
+  query: {
+    join: {
+      queueItems: {
+        eager: false,
+      },
+      'queueItems.queue': {
+        eager: false,
+      },
+    },
+    alwaysPaginate: true,
+    limit: 25,
+    maxLimit: 25,
+  },
   routes: {
-    only: ['getManyBase']
-  }
+    only: ['getManyBase'],
+  },
 })
 @Controller('users')
 @UseGuards(JwtAuthGuard)
