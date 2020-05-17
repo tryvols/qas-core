@@ -6,7 +6,7 @@ import {
   UseGuards,
   Req,
 } from '@nestjs/common';
-import { Crud } from '@nestjsx/crud';
+import { Crud, CrudRequest, CrudController, Override, ParsedRequest, ParsedBody } from '@nestjsx/crud';
 import { Queue } from './queue.entity';
 import { QueueService } from './queue.service';
 import { CreateQueueDto } from './dto/create-queue.dto';
@@ -39,8 +39,59 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 })
 @UseGuards(JwtAuthGuard)
 @Controller('queues')
-export class QueueController {
+export class QueueController implements CrudController<Queue> {
   constructor(public readonly service: QueueService) {}
+
+  get base(): CrudController<Queue> {
+    return this;
+  }
+
+  @Override()
+  createOne(
+    @Req() req: any,
+    @ParsedRequest() crudReq: CrudRequest,
+    @ParsedBody() dto: CreateQueueDto & { ownerId?: number },
+  ) {
+    dto.ownerId = req.user.id;
+    // @ts-ignore
+    return this.base.createOneBase(crudReq, dto);
+  }
+
+  @Override()
+  async updateOne(
+    @Req() req: any,
+    @Param('id') queueId: number,
+    @ParsedRequest() crudReq: CrudRequest,
+    @ParsedBody() dto: UpdateQueueDto,
+  ) {
+    const queue = await this.service.findOne(queueId);
+    if (!queue) {
+      throw new BadRequestException(`Queue with ${queueId} does not exists.`);
+    }
+    if (req.user.id !== queue.ownerId) {
+      throw new BadRequestException(`You must be owner of the queue to update it.`);
+    }
+    // @ts-ignore
+    return this.base.updateOneBase(crudReq, dto);
+  }
+
+  @Override()
+  async deleteOne(
+    @Req() req: any,
+    @Param('id') queueId: number,
+    @ParsedRequest() crudReq: CrudRequest,
+  ) {
+    const queue = await this.service.findOne(queueId);
+    if (!queue) {
+      throw new BadRequestException(`Queue with ${queueId} does not exists.`);
+    }
+    if (req.user.id !== queue.ownerId) {
+      throw new BadRequestException(`You must be owner of the queue to delete it.`);
+    }
+    this.service.clearQueueItems(queue);
+    // @ts-ignore
+    return this.base.deleteOneBase(crudReq);
+  }
 
   @Post(':queueId/enter')
   async enterQueue(

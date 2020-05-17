@@ -18,8 +18,8 @@ export class UsersService extends TypeOrmCrudService<User> {
   // TODO:clear-before-production
   async initUsers(): Promise<void> {
     await this.usersRepository.insert([{
-      username: 'john',
-      password: await UsersUtils.encodePassword('changeme'),
+      username: 'username',
+      password: await UsersUtils.encodePassword('password'),
       firstName: 'John',
       lastName: 'Readlock',
     }, {

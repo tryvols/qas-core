@@ -1,6 +1,6 @@
 import { IsString, MinLength, MaxLength } from "class-validator";
-import { ValidIfCondition } from "src/common/validators/condition.validator";
-import { Unique } from "src/common/validators/unique.validator";
+import { ValidIfCondition } from "../../common/validators/condition.validator";
+import { Unique } from "../../common/validators/unique.validator";
 import { User } from "../user.entity";
 
 export class CreateUserDto {

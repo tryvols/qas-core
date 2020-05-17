@@ -1,6 +1,6 @@
 import { Entity, Column, OneToMany } from "typeorm";
-import { BaseEntity } from "src/common/entities/base.entity";
-import { QueueItem } from "src/queue-item/queue-item.entity";
+import { BaseEntity } from "../common/entities/base.entity";
+import { QueueItem } from "../queue-item/queue-item.entity";
 
 @Entity()
 export class Queue extends BaseEntity {
@@ -9,6 +9,9 @@ export class Queue extends BaseEntity {
 
   @Column()
   address: string;
+
+  @Column()
+  ownerId: number;
 
   @Column({ type: 'timestamp', nullable: true })
   expiresAt: Date;

@@ -16,6 +16,12 @@ import { QueueItemService } from './queue-item.service';
         eager: false,
       },
     },
+    sort: [
+      {
+        field: 'priority',
+        order: 'ASC',
+      },
+    ],
     alwaysPaginate: true,
     limit: 25,
     maxLimit: 25,

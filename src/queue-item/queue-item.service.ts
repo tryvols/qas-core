@@ -3,8 +3,8 @@ import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
 import { QueueItem } from './queue-item.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Queue } from 'src/queue/queue.entity';
-import { User } from 'src/users/user.entity';
+import { Queue } from '../queue/queue.entity';
+import { User } from '../users/user.entity';
 
 @Injectable()
 export class QueueItemService extends TypeOrmCrudService<QueueItem> {
@@ -12,6 +12,10 @@ export class QueueItemService extends TypeOrmCrudService<QueueItem> {
     @InjectRepository(QueueItem) queueItemsRepository: Repository<QueueItem>,
   ) {
     super(queueItemsRepository);
+  }
+
+  async clearAllByQueue(queue: Queue): Promise<void> {
+    this.repo.delete({ queue });
   }
   
   async addItem(queue: Queue, user: User): Promise<QueueItem> {
